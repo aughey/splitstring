@@ -5,6 +5,9 @@
 // The delimiter separates numbers.
 // there will be exactly three numbers
 // the numbers will be in the range 0-65535
+// non-numbers (cannot be converted with stoi) will return nullopt
+// numbers out of range will return nullopt
+// missing numbers will return nullopt
 SiteAppEntityOpt NewSplitString(const std::string &str, const std::string &delimiter) {
    // sized as ints because stoi returns an int, we will do range checking and
    // then static cast to uint16_t.
