@@ -1,44 +1,67 @@
 #include "splitstring.h"
 #include <iostream>
 
+// Takes a string in the form 123,456,789 and returns a tuple of three uint16_t's.
+// The delimiter separates numbers.
+// there will be exactly three numbers
+// the numbers will be in the range 0-65535
 SiteAppEntityOpt NewSplitString(const std::string &str, const std::string &delimiter) {
-   uint16_t site;
-   uint16_t app;
-   uint16_t entity;
+   // sized as ints because stoi returns an int, we will do range checking and
+   // then static cast to uint16_t.
+   int first;
+   int second;
+   int third;
 
    // Do each individually/explicitly (since there are only three)
-   auto site_pos = str.find(delimiter);
-   if (site_pos == std::string::npos) {
+   auto first_pos = str.find(delimiter);
+   if (first_pos == std::string::npos) {
       return std::nullopt;
    }
    try {
-      site = std::stoi(str.substr(0, site_pos));
+      first = std::stoi(str.substr(0, first_pos));
    } catch(...) {
       //std::cerr << "invalid number found found in string: " << str << std::endl;
+      return std::nullopt;
+   }
+   // Check range
+   if (first > UINT16_MAX || first < 0) {
+      //std::cerr << "Out of range number in first value: " << str << std::endl;
       return std::nullopt;
    }
    
-   auto app_pos = str.find(delimiter, site_pos + 1);
-   if (app_pos == std::string::npos) {
+   auto second_pos = str.find(delimiter, first_pos + 1);
+   if (second_pos == std::string::npos) {
       return std::nullopt;
    }
    try {
-      app = std::stoi(str.substr(site_pos + 1, app_pos - site_pos - 1));
+      auto secondstr = str.substr(first_pos + 1, second_pos - first_pos - 1);
+      second = std::stoi(secondstr);
    } catch(...) {
       //std::cerr << "invalid number found found in string: " << str << std::endl;
+      return std::nullopt;
+   }
+   // Check range
+   if (second > UINT16_MAX || second < 0) {
+      //std::cerr << "Out of range number in second value: " << str << std::endl;
       return std::nullopt;
    }
 
    // last one doesn't have a comma, so it's just the remaining string
-   auto entity_str = str.substr(app_pos + 1);
+   auto entity_str = str.substr(second_pos + 1);
    try {
-      entity = std::stoi(entity_str);
+      third = std::stoi(entity_str);
    } catch(...) {
       //std::cerr << "invalid number found found in string: " << str << std::endl;
       return std::nullopt;
    }
+   // Check range
+   if (third > UINT16_MAX || third < 0) {
+      //std::cerr << "Out of range number in third value: " << str << std::endl;
+      return std::nullopt;
+   }
 
-   return std::make_tuple(site, app, entity);
+   // Range checking was done above, this static cast is valid
+   return std::make_tuple(static_cast<uint16_t>(first), static_cast<uint16_t>(second), static_cast<uint16_t>(third));
 }
 
 void OldSplitString(std::string str, const std::string &delimiter, uint16_t result[3])
@@ -88,28 +111,3 @@ void OldSplitString(std::string str, const std::string &delimiter, uint16_t resu
 
    result[index] = myInt16;
 }
-
-/*
-int main(int argc, char *argv[]) {
-   std::string test_string_1 = "1,2,3";
-
-   uint16_t result[3];
-   OldSplitString(test_string_1, ",", result);
-   assert(result[0] == 1);
-   assert(result[1] == 2);
-   assert(result[2] == 3);
-
-   auto sae = NewSplitString(test_string_1, ",");
-   assert(sae.has_value());
-   assert(std::get<0>(sae.value()) == 1);
-   assert(std::get<1>(sae.value()) == 2);
-   assert(std::get<2>(sae.value()) == 3);
-
-   // FAILS!
-   // std::string test_string_2 = "A,2,3,4";
-   // OldSplitString(test_string_2, ",", result);
-   // assert(result[0] == 0);
-   // assert(result[1] == 2);
-   // assert(result[2] == 3);
-}
-*/
