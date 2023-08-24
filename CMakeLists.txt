@@ -1,4 +1,5 @@
-project(Demo)
+cmake_policy(SET CMP0048 NEW)
+project(Demo VERSION 0.0.1)
 cmake_minimum_required(VERSION 3.18)
 
 # set c++ standard to 17
