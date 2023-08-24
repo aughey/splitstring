@@ -2,18 +2,21 @@
 
 pub fn split_string_like_cpp(value: &str, delimiter: &str) -> Option<(u16, u16, u16)> {
     let first_pos = value.find(delimiter); // find the index of the delimiter
-    if first_pos.is_none() { // fail if didn't find
+    if first_pos.is_none() {
+        // fail if didn't find
         return None;
     }
     let first_pos_index = first_pos.unwrap(); // "safe" because of first_pos.is_some()
 
     let first_substr = value.get(0..first_pos_index).unwrap(); // create a string of what's before the delimiter
     let first_conversation = first_substr.parse::<i32>(); // parse that string to an i32
-    if first_conversation.is_err() { // fail if the parse failed
+    if first_conversation.is_err() {
+        // fail if the parse failed
         return None;
     }
     let first = first_conversation.unwrap(); // "safe" because of first_conversation.is_ok()
-    if first < 0 || first > 65535 { // Range checking to make sure it will fit in a u16
+    if first < 0 || first > 65535 {
+        // Range checking to make sure it will fit in a u16
         return None;
     }
     // Get a substring that is the remaining of the string with the first and the delimiter removed
@@ -53,11 +56,89 @@ pub fn split_string_like_cpp(value: &str, delimiter: &str) -> Option<(u16, u16, 
     return Some((first as u16, second as u16, third as u16));
 }
 
+pub fn split_string_like_cpp_no_unwrap(value: &str, delimiter: &str) -> Option<(u16, u16, u16)> {
+    let first_pos = value.find(delimiter); // find the index of the delimiter
+    let first_pos_index = if let Some(i) = first_pos {
+        // fail if didn't find
+        i
+    } else {
+        return None;
+    };
+
+    let first_substr = if let Some(s) = value.get(0..first_pos_index) {
+        s
+    } else {
+        return None;
+    };
+    let first_conversation = first_substr.parse::<i32>(); // parse that string to an i32
+    let first = if let Ok(value) = first_conversation {
+        value
+    } else {
+        // fail if the parse failed
+        return None;
+    };
+    if first < 0 || first > 65535 {
+        // Range checking to make sure it will fit in a u16
+        return None;
+    }
+    // Get a substring that is the remaining of the string with the first and the delimiter removed
+    let first_remaining = if let Some(remaining) = value.get((first_pos_index + delimiter.len())..)
+    {
+        remaining
+    } else {
+        return None;
+    };
+
+    let second_pos = first_remaining.find(delimiter);
+    let second_pos_index = if let Some(i) = second_pos {
+        i
+    } else {
+        return None;
+    };
+
+    let second_substr = if let Some(s) = first_remaining.get(0..second_pos_index) {
+        s
+    } else {
+        return None;
+    };
+    let second_conversation = second_substr.parse::<i32>();
+    let second = if let Ok(value) = second_conversation {
+        value
+    } else {
+        return None;
+    };
+    if second < 0 || second > 65535 {
+        return None;
+    }
+    // Get a substring that is the remaining of the string with the second and the delimiter removed
+    let second_remaining =
+        if let Some(s) = first_remaining.get((second_pos_index + delimiter.len())..) {
+            s
+        } else {
+            return None;
+        };
+
+    // Third is just a parse of the second remaining
+    let third_conversation = second_remaining.parse::<i32>();
+    let third = if let Ok(value) = third_conversation {
+        value
+    } else {
+        return None;
+    };
+    if third < 0 || third > 65535 {
+        return None;
+    }
+
+    // Range checking was done above, this static cast is valid
+    return Some((first as u16, second as u16, third as u16));
+}
+
 pub fn split_string_try_op(value: &str, delimiter: &str) -> Option<(u16, u16, u16)> {
     let first_pos = value.find(delimiter)?; // Find the index of the delimiter
     let first_substr = value.get(0..first_pos)?; // extract the substring of the first item
     let first = first_substr.parse::<i32>().ok()?; // parse it to an i32
-    if first < 0 || first > 65535 { // range check to make sure it will fit in a u16
+    if first < 0 || first > 65535 {
+        // range check to make sure it will fit in a u16
         return None;
     }
     let first_remaining = value.get((first_pos + delimiter.len())..)?; // Get the remaining string

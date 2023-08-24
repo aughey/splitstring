@@ -11,6 +11,7 @@ use rustimpl::*;
 #[case(split_string_3_iterparse)]
 #[case(split_string_try_op_no_conditionals)]
 #[case(split_string_try_op_one_line)]
+#[case(split_string_like_cpp_no_unwrap)]
 fn all_splits(#[case] split : impl Fn(&str, &str) -> Option<(u16, u16, u16)>) {}
 
 #[apply(all_splits)]
