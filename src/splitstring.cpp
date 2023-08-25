@@ -1,6 +1,15 @@
 #include "splitstring.h"
 #include <iostream>
 
+// Pictoral representation of the extraction process
+// Original String: 1 2 3 , 4 5 6 , 7 8 9
+//                  first POS
+// Extracted value: 1 2 3
+// Substring: 4 5 6 , 7 8 9
+//                   secondPOS
+// Extracted value: 4 5 6
+// Final extraction: 7 8 9
+
 // Takes a string in the form 123,456,789 and returns a tuple of three uint16_t's.
 // The delimiter separates numbers.
 // there will be exactly three numbers
@@ -36,7 +45,6 @@ ThreeValuesOpt NewSplitString(const std::string &str, const std::string &delimit
    // Check range
    if (first > UINT16_MAX || first < 0)
    {
-      // std::cerr << "Out of range number in first value: " << str << std::endl;
       return std::nullopt;
    }
 
