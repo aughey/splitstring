@@ -59,9 +59,9 @@ pub fn split_string_like_cpp(value: &str, delimiter: &str) -> Option<(u16, u16, 
 pub fn split_string_like_cpp_no_unwrap(value: &str, delimiter: &str) -> Option<(u16, u16, u16)> {
     let first_pos = value.find(delimiter); // find the index of the delimiter
     let first_pos_index = if let Some(i) = first_pos {
-        // fail if didn't find
         i
     } else {
+        // fail if didn't find
         return None;
     };
 
@@ -131,6 +131,69 @@ pub fn split_string_like_cpp_no_unwrap(value: &str, delimiter: &str) -> Option<(
 
     // Range checking was done above, this static cast is valid
     return Some((first as u16, second as u16, third as u16));
+}
+
+pub fn split_string_like_cpp_i_need_help(value: &str, delimiter: &str) -> Option<(u16, u16, u16)> {
+    let first_pos = value.find(delimiter); // find the index of the delimiter
+    if let Some(first_pos_index) = first_pos {
+        if let Some(first_substr) = value.get(0..first_pos_index) {
+            let first_conversation = first_substr.parse::<i32>(); // parse that string to an i32
+            if let Ok(first) = first_conversation {
+                if first < 0 || first > 65535 {
+                    // Range checking to make sure it will fit in a u16
+                    return None;
+                }
+                // Get a substring that is the remaining of the string with the first and the delimiter removed
+
+                if let Some(first_remaining) = value.get((first_pos_index + delimiter.len())..) {
+                    let second_pos = first_remaining.find(delimiter);
+                    if let Some(second_pos_index) = second_pos {
+                        if let Some(second_substr) = first_remaining.get(0..second_pos_index) {
+                            let second_conversation = second_substr.parse::<i32>();
+                            if let Ok(second) = second_conversation {
+                                if second < 0 || second > 65535 {
+                                    return None;
+                                }
+                                // Get a substring that is the remaining of the string with the second and the delimiter removed
+                                if let Some(second_remaining) =
+                                    first_remaining.get((second_pos_index + delimiter.len())..)
+                                {
+                                    // Third is just a parse of the second remaining
+                                    let third_conversation = second_remaining.parse::<i32>();
+                                    if let Ok(third) = third_conversation {
+                                        if third < 0 || third > 65535 {
+                                            return None;
+                                        }
+
+                                        // Range checking was done above, this static cast is valid
+                                        return Some((first as u16, second as u16, third as u16));
+                                    } else {
+                                        return None; // couldn't convert third value
+                                    }
+                                } else {
+                                    return None; // couldn't get second remaining
+                                }
+                            } else {
+                                return None; // couldn't convert second value
+                            }
+                        } else {
+                            return None; // couldn't get second substring
+                        }
+                    } else {
+                        return None; // couldn't find second delimiter
+                    }
+                } else {
+                    return None; // couldn't get first remaining
+                }
+            } else {
+                return None; // couldn't convert first value
+            }
+        } else {
+            return None; // couldn't get first substring
+        }
+    } else {
+        return None; // couldn't find first delimiter
+    }
 }
 
 pub fn split_string_try_op(value: &str, delimiter: &str) -> Option<(u16, u16, u16)> {
