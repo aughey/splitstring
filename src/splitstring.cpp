@@ -8,7 +8,8 @@
 // non-numbers (cannot be converted with stoi) will return nullopt
 // numbers out of range will return nullopt
 // missing numbers will return nullopt
-ThreeValuesOpt NewSplitString(const std::string &str, const std::string &delimiter) {
+ThreeValuesOpt NewSplitString(const std::string &str, const std::string &delimiter)
+{
    // sized as ints because stoi returns an int, we will do range checking and
    // then static cast to uint16_t.
    int first;
@@ -16,50 +17,67 @@ ThreeValuesOpt NewSplitString(const std::string &str, const std::string &delimit
    int third;
 
    // Do each individually/explicitly (since there are only three)
-   auto first_pos = str.find(delimiter);
-   if (first_pos == std::string::npos) {
+   auto first_pos = str.find(delimiter); // find the index of the delimiter
+   if (first_pos == std::string::npos)
+   {
+      // fail if didn't find
       return std::nullopt;
    }
-   try {
+   // Extract the substring and convert
+   try
+   {
       first = std::stoi(str.substr(0, first_pos));
-   } catch(...) {
-      //std::cerr << "invalid number found found in string: " << str << std::endl;
+   }
+   catch (...)
+   {
+      // stoi failed (substr is going to succeed)
       return std::nullopt;
    }
    // Check range
-   if (first > UINT16_MAX || first < 0) {
-      //std::cerr << "Out of range number in first value: " << str << std::endl;
-      return std::nullopt;
-   }
-   
-   auto second_pos = str.find(delimiter, first_pos + delimiter.length());
-   if (second_pos == std::string::npos) {
-      return std::nullopt;
-   }
-   try {
-      auto secondstr = str.substr(first_pos + delimiter.length(), second_pos - first_pos - 1);
-      second = std::stoi(secondstr);
-   } catch(...) {
-      //std::cerr << "invalid number found found in string: " << str << std::endl;
-      return std::nullopt;
-   }
-   // Check range
-   if (second > UINT16_MAX || second < 0) {
-      //std::cerr << "Out of range number in second value: " << str << std::endl;
+   if (first > UINT16_MAX || first < 0)
+   {
+      // std::cerr << "Out of range number in first value: " << str << std::endl;
       return std::nullopt;
    }
 
-   // last one doesn't have a comma, so it's just the remaining string
-   auto entity_str = str.substr(second_pos + delimiter.length());
-   try {
-      third = std::stoi(entity_str);
-   } catch(...) {
-      //std::cerr << "invalid number found found in string: " << str << std::endl;
+   // Find the second position, find can search from a starting point, so we
+   // calculate the starting point from where the delimiter was plus the length of delim
+   auto second_pos = str.find(delimiter, first_pos + delimiter.length());
+   if (second_pos == std::string::npos)
+   {
+      return std::nullopt;
+   }
+   try
+   {
+      // Extract the substring and convert to int all in one.
+      second = std::stoi(str.substr(first_pos + delimiter.length(), second_pos - first_pos - 1));
+   }
+   catch (...)
+   {
+      // Failed to convert
       return std::nullopt;
    }
    // Check range
-   if (third > UINT16_MAX || third < 0) {
-      //std::cerr << "Out of range number in third value: " << str << std::endl;
+   if (second > UINT16_MAX || second < 0)
+   {
+      return std::nullopt;
+   }
+
+   // last one doesn't have a comma, so it's just the remaining string from the
+   // second delimiter position plus its length
+   auto entity_str = str.substr(second_pos + delimiter.length());
+   try
+   {
+      third = std::stoi(entity_str);
+   }
+   catch (...)
+   {
+      // Failed to convert
+      return std::nullopt;
+   }
+   // Check range
+   if (third > UINT16_MAX || third < 0)
+   {
       return std::nullopt;
    }
 
