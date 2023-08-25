@@ -8,7 +8,7 @@
 // non-numbers (cannot be converted with stoi) will return nullopt
 // numbers out of range will return nullopt
 // missing numbers will return nullopt
-SiteAppEntityOpt NewSplitString(const std::string &str, const std::string &delimiter) {
+ThreeValuesOpt NewSplitString(const std::string &str, const std::string &delimiter) {
    // sized as ints because stoi returns an int, we will do range checking and
    // then static cast to uint16_t.
    int first;
@@ -32,12 +32,12 @@ SiteAppEntityOpt NewSplitString(const std::string &str, const std::string &delim
       return std::nullopt;
    }
    
-   auto second_pos = str.find(delimiter, first_pos + 1);
+   auto second_pos = str.find(delimiter, first_pos + delimiter.length());
    if (second_pos == std::string::npos) {
       return std::nullopt;
    }
    try {
-      auto secondstr = str.substr(first_pos + 1, second_pos - first_pos - 1);
+      auto secondstr = str.substr(first_pos + delimiter.length(), second_pos - first_pos - 1);
       second = std::stoi(secondstr);
    } catch(...) {
       //std::cerr << "invalid number found found in string: " << str << std::endl;
@@ -50,7 +50,7 @@ SiteAppEntityOpt NewSplitString(const std::string &str, const std::string &delim
    }
 
    // last one doesn't have a comma, so it's just the remaining string
-   auto entity_str = str.substr(second_pos + 1);
+   auto entity_str = str.substr(second_pos + delimiter.length());
    try {
       third = std::stoi(entity_str);
    } catch(...) {

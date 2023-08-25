@@ -3,8 +3,8 @@
 #include <optional>
 #include <tuple>
 
-typedef std::tuple<uint16_t, uint16_t, uint16_t> SiteAppEntity;
-typedef std::optional<SiteAppEntity> SiteAppEntityOpt;
+typedef std::tuple<uint16_t, uint16_t, uint16_t> ThreeValues;
+typedef std::optional<ThreeValues> ThreeValuesOpt;
 
-SiteAppEntityOpt NewSplitString(const std::string &str, const std::string &delimiter);
+ThreeValuesOpt NewSplitString(const std::string &str, const std::string &delimiter);
 void OldSplitString(std::string str, const std::string &delimiter, uint16_t result[3]);

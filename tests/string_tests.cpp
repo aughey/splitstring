@@ -86,3 +86,11 @@ TEST(NewStringSplit, HighRangePass) {
     assert(std::get<1>(onetwothree.value()) == 65535);
     assert(std::get<2>(onetwothree.value()) == 65535);
 }
+
+TEST(NewStringSplit, MultiCharDelimiter) {
+    auto onetwothree = NewSplitString("1##2##3", "##");
+    assert(onetwothree.has_value());
+    assert(std::get<0>(onetwothree.value()) == 1);
+    assert(std::get<1>(onetwothree.value()) == 2);
+    assert(std::get<2>(onetwothree.value()) == 3);
+}

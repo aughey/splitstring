@@ -91,3 +91,10 @@ fn too_many_numbers(#[case] split : impl Fn(&str, &str) -> Option<(u16, u16, u16
     let res = split("1,2,3,4", ",");
     assert_eq!(res, None);
 }
+
+
+#[apply(all_splits)]
+fn multi_char_delimiter(#[case] split : impl Fn(&str, &str) -> Option<(u16, u16, u16)>) {
+    let res = split("1##2##3", "##");
+    assert_eq!(res, Some((1, 2, 3)));   
+}
