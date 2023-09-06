@@ -110,14 +110,14 @@ TEST(ForRangeLooping, MyContainer)
     }
 
     int external_index = 1;
-    for (auto value : MyContainerRange(vec))
+    for (auto &value : MyContainerRange(vec))
     {
         ASSERT_EQ(value, external_index);
         ++external_index;
     }
 
     external_index = 1;
-    for (auto value : all_values(vec))
+    for (auto &value : all_values(vec))
     {
         ASSERT_EQ(value, external_index);
         ++external_index;
